@@ -38,6 +38,7 @@ export class Directory {
         let entry = this;
         for (let component of path.split("/")) {
             if (component == "") break;
+            if (component == ".") continue;
             if (entry.contents[component] != undefined) {
                 entry = entry.contents[component];
             } else {
