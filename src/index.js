@@ -1,12 +1,7 @@
 import WASI from "./wasi.js"
-import { File } from "./fs_core.js"
-import { PreopenDirectory } from "./fs_fd.js"
-import { strace } from "./strace.js"
+export { WASI };
 
-module.exports = {
-    WASI,
-    File,
-    PreopenDirectory,
-    strace,
-}
-
+export { Fd } from './fd.js';
+export { File, Directory } from "./fs_core.js";
+export { OpenFile, OpenDirectory, PreopenDirectory } from "./fs_fd.js";
+export { strace } from "./strace.js";

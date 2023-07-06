@@ -37,6 +37,10 @@ export class Directory {
     get_entry_for_path(path/*: string*/)/*: File | Directory | null*/ {
         let entry = this;
         for (let component of path.split("/")) {
+            if (!(entry instanceof Directory)) {
+              throw 'Unhandled, path segment not a directory and should return ERRNO_NOTDIR.'
+            }
+
             if (component == "") break;
             if (component == ".") continue;
             if (entry.contents[component] != undefined) {
@@ -49,7 +53,7 @@ export class Directory {
         return entry;
     }
 
-    create_entry_for_path(path/*: string*/)/*: File | Directory*/ {
+    create_entry_for_path(path/*: string*/, is_dir)/*: File | Directory*/ {
         // FIXME fix type errors
         let entry = this;
         let components/*: Array<string>*/ = path.split("/").filter((component) => component != "/");
@@ -59,7 +63,7 @@ export class Directory {
                 entry = entry.contents[component];
             } else {
                 console.log("create", component);
-                if (i == components.length - 1) {
+                if (i == components.length - 1 && !is_dir) {
                     entry.contents[component] = new File(new ArrayBuffer(0));
                 } else {
                     entry.contents[component] = new Directory({});

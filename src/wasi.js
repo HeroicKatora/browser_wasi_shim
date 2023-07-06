@@ -22,6 +22,7 @@ export default class WASI {
         let self = this;
         this.wasiImport = {
             args_sizes_get(argc/*: number*/, argv_buf_size/*: number*/)/*: number*/ {
+                console.log('args_sizes_get', argc, argv_buf_size);
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 buffer.setUint32(argc, self.args.length, true);
                 let buf_size = 0;
@@ -29,10 +30,11 @@ export default class WASI {
                     buf_size += arg.length + 1;
                 }
                 buffer.setUint32(argv_buf_size, buf_size, true);
-                console.log(buffer.getUint32(argc, true), buffer.getUint32(argv_buf_size, true));
+                console.log('args_sizes_get', buffer.getUint32(argc, true), buffer.getUint32(argv_buf_size, true));
                 return 0;
             },
             args_get(argv/*: number*/, argv_buf/*: number*/)/*: number*/ {
+                console.log('args_get', argv, argv_buf);
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 let orig_argv_buf = argv_buf;
@@ -49,6 +51,7 @@ export default class WASI {
             },
 
             environ_sizes_get(environ_count/*: number*/, environ_size/*: number*/)/*: number*/ {
+                console.log('environ_sizes_get', environ_count, environ_size);
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 buffer.setUint32(environ_count, self.env.length, true);
                 let buf_size = 0;
@@ -56,10 +59,11 @@ export default class WASI {
                     buf_size += environ.length + 1;
                 }
                 buffer.setUint32(environ_size, buf_size, true);
-                console.log(buffer.getUint32(environ_count, true), buffer.getUint32(environ_size, true));
+                console.log('environ_sizes_get', buffer.getUint32(environ_count, true), buffer.getUint32(environ_size, true));
                 return 0;
             },
             environ_get(environ/*: number*/, environ_buf/*: number*/)/*: number*/ {
+                console.log('environ_get', environ, environ_buf);
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 let orig_environ_buf = environ_buf;
@@ -76,9 +80,11 @@ export default class WASI {
             },
 
             clock_res_get(id/*: number*/, res_ptr/*: number*/)/*: number*/ {
+                console.log('clock_res_get');
                 throw "unimplemented";
             },
             clock_time_get(id/*: number*/, precision/*: BigInt*/, time/*: number*/)/*: number*/ {
+                console.log('clock_time_get');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 if (id === wasi.CLOCKID_REALTIME) {
                     buffer.setBigUint64(time, BigInt(new Date().getTime()) * 1000000n, true);
@@ -90,6 +96,7 @@ export default class WASI {
             },
 
             fd_advise(fd/*: number*/, offset/*: BigInt*/, len/*: BigInt*/, advice/*: number*/)/*: number*/ {
+                console.log('fd_advise');
                 if (self.fds[fd] != undefined) {
                     return self.fds[fd].fd_advise(offset, len, advice);
                 } else {
@@ -97,6 +104,7 @@ export default class WASI {
                 }
             },
             fd_allocate(fd/*: number*/, offset/*: BigInt*/, len/*: BigInt*/)/*: number*/ {
+                console.log('fd_allocate');
                 if (self.fds[fd] != undefined) {
                     return self.fds[fd].fd_allocate(offset, len);
                 } else {
@@ -104,6 +112,7 @@ export default class WASI {
                 }
             },
             fd_close(fd/*: number*/)/*: number*/ {
+                console.log('fd_close');
                 if (self.fds[fd] != undefined) {
                     let ret = self.fds[fd].fd_close();
                     self.fds[fd] = undefined;
@@ -113,6 +122,7 @@ export default class WASI {
                 }
             },
             fd_datasync(fd/*: number*/)/*: number*/ {
+                console.log('fd_datasync');
                 if (self.fds[fd] != undefined) {
                     return self.fds[fd].fd_datasync();
                 } else {
@@ -120,6 +130,7 @@ export default class WASI {
                 }
             },
             fd_fdstat_get(fd/*: number*/, fdstat_ptr/*: number*/)/*: number*/ {
+                console.log('fd_fdstat_get');
                 if (self.fds[fd] != undefined) {
                     let { ret, fdstat } = self.fds[fd].fd_fdstat_get();
                     if (fdstat != null) {
@@ -131,6 +142,7 @@ export default class WASI {
                 }
             },
             fd_fdstat_set_flags(fd/*: number*/, flags/*: number*/)/*: number*/ {
+                console.log('fd_fdstat_set_flags');
                 if (self.fds[fd] != undefined) {
                     return self.fds[fd].fd_fdstat_set_flags(flags);
                 } else {
@@ -138,6 +150,7 @@ export default class WASI {
                 }
             },
             fd_fdstat_set_rights(fd/*: number*/, fs_rights_base/*: BigInt*/, fs_rights_inheriting/*: BigInt*/)/*: number*/ {
+                console.log('fd_fdstat_set_rights');
                 if (self.fds[fd] != undefined) {
                     return self.fds[fd].fd_fdstat_set_rights(fs_rights_base, fs_rights_inheriting);
                 } else {
@@ -145,6 +158,7 @@ export default class WASI {
                 }
             },
             fd_filestat_get(fd/*: number*/, filestat_ptr/*: number*/)/*: number*/ {
+                console.log('fd_filestat_get');
                 if (self.fds[fd] != undefined) {
                     let { ret, filestat } = self.fds[fd].fd_filestat_get();
                     if (filestat != null) {
@@ -156,6 +170,7 @@ export default class WASI {
                 }
             },
             fd_filestat_set_size(fd/*: number*/, size/*: BigInt*/)/*: number*/ {
+                console.log('fd_filestat_set_size');
                 if (self.fds[fd] != undefined) {
                     return self.fds[fd].fd_filestat_set_size(size);
                 } else {
@@ -163,6 +178,7 @@ export default class WASI {
                 }
             },
             fd_filestat_set_times(fd/*: number*/, atim/*: BigInt*/, mtim/*: BigInt*/, fst_flags/*: number*/)/*: number*/ {
+                console.log('fd_filestat_set_times');
                 if (self.fds[fd] != undefined) {
                     return self.fds[fd].fd_filestat_set_times(atim, mtim, fst_flags);
                 } else {
@@ -170,6 +186,7 @@ export default class WASI {
                 }
             },
             fd_pread(fd/*: number*/, iovs_ptr/*: number*/, iovs_len/*: number*/, offset/*: BigInt*/, nread_ptr/*: number*/)/*: number*/ {
+                console.log('fs_pread');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
@@ -182,6 +199,7 @@ export default class WASI {
                 }
             },
             fd_prestat_get(fd/*: number*/, buf_ptr/*: number*/)/*: number*/ {
+                console.log('fs_prestat_get');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
                     let { ret, prestat } = self.fds[fd].fd_prestat_get();
@@ -194,6 +212,7 @@ export default class WASI {
                 }
             },
             fd_prestat_dir_name(fd/*: number*/, path_ptr/*: number*/, path_len/*: number*/)/*: number*/ {
+                console.log('fs_prestat_dir_name');
                 // FIXME don't ignore path_len
                 if (self.fds[fd] != undefined) {
                     let { ret, prestat_dir_name } = self.fds[fd].fd_prestat_dir_name();
@@ -207,6 +226,7 @@ export default class WASI {
                 }
             },
             fd_pwrite(fd/*: number*/, iovs_ptr/*: number*/, iovs_len/*: number*/, offset/*: number*/, nwritten_ptr/*: number*/)/*: number*/ {
+                console.log('fs_pwrite');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
@@ -219,6 +239,7 @@ export default class WASI {
                 }
             },
             fd_read(fd/*: number*/, iovs_ptr/*: number*/, iovs_len/*: number*/, nread_ptr/*: number*/)/*: number*/ {
+                console.log('fs_read');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
@@ -231,6 +252,7 @@ export default class WASI {
                 }
             },
             fd_readdir(fd/*: number*/, buf/*: number*/, buf_len/*: number*/, cookie/*: BigInt*/, bufused_ptr/*: number*/)/*: number*/ {
+                console.log('fs_readdir');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
@@ -264,6 +286,7 @@ export default class WASI {
                 }
             },
             fd_renumber(fd/*: number*/, to/*: number*/) {
+                console.log('fs_renumber');
                 if (self.fds[fd] != undefined && self.fds[to] != undefined) {
                     let ret = self.fds[to].fd_close();
                     if (ret != 0) {
@@ -277,6 +300,7 @@ export default class WASI {
                 }
             },
             fd_seek(fd/*: number*/, offset/*: number*/, whence/*: number*/, offset_out_ptr/*: number*/)/*: number*/ {
+                console.log('fd_seek');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
                     let { ret, offset_out } = self.fds[fd].fd_seek(offset, whence);
@@ -287,6 +311,7 @@ export default class WASI {
                 }
             },
             fd_sync(fd/*: number*/)/*: number*/ {
+                console.log('fd_sync');
                 if (self.fds[fd] != undefined) {
                     return self.fds[fd].fd_sync();
                 } else {
@@ -294,6 +319,7 @@ export default class WASI {
                 }
             },
             fd_tell(fd/*: number*/, offset_ptr/*: number*/)/*: number*/ {
+                console.log('fd_tell');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
                     let { ret, offset } = self.fds[fd].fd_tell();
@@ -304,6 +330,7 @@ export default class WASI {
                 }
             },
             fd_write(fd/*: number*/, iovs_ptr/*: number*/, iovs_len/*: number*/, nwritten_ptr/*: number*/)/*: number*/ {
+                console.log('fd_write');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
@@ -316,13 +343,18 @@ export default class WASI {
                 }
             },
             path_create_directory(fd/*: number*/, path_ptr/*: number*/, path_len/*: number*/)/*: number*/ {
+                console.log('path_create_directory', fd, path_ptr, path_len);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
                     let path = new TextDecoder("utf-8").decode(buffer8.slice(path_ptr, path_ptr + path_len));
+                    console.log('path_create_directory', path);
                     return self.fds[fd].path_create_directory(path);
+                } else {
+                  return wasi.ERRNO_BADF;
                 }
             },
             path_filestat_get(fd/*: number*/, flags/*: number*/, path_ptr/*: number*/, path_len/*: number*/, filestat_ptr/*: number*/)/*: number*/ {
+                console.log('path_filestat_get');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
@@ -337,6 +369,7 @@ export default class WASI {
                 }
             },
             path_filestat_set_times(fd/*: number*/, flags/*: number*/, path_ptr/*: number*/, path_len/*: number*/, atim, mtim, fst_flags) {
+                console.log('path_filestat_set_times');
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
                     let path = new TextDecoder("utf-8").decode(buffer8.slice(path_ptr, path_ptr + path_len));
@@ -346,6 +379,7 @@ export default class WASI {
                 }
             },
             path_link(old_fd/*: number*/, old_flags, old_path_ptr/*: number*/, old_path_len/*: number*/, new_fd/*: number*/, new_path_ptr/*: number*/, new_path_len/*: number*/)/*: number*/ {
+                console.log('path_link');
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[old_fd] != undefined && self.fds[new_fd] != undefined) {
                     let old_path = new TextDecoder("utf-8").decode(buffer8.slice(old_path_ptr, old_path_ptr + old_path_len));
@@ -356,6 +390,7 @@ export default class WASI {
                 }
             },
             path_open(fd/*: number*/, dirflags, path_ptr/*: number*/, path_len/*: number*/, oflags, fs_rights_base, fs_rights_inheriting, fd_flags, opened_fd_ptr/*: number*/)/*: number*/ {
+                console.log('path_open');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
@@ -375,6 +410,7 @@ export default class WASI {
                 }
             },
             path_readlink(fd/*: number*/, path_ptr/*: number*/, path_len/*: number*/, buf_ptr/*: number*/, buf_len/*: number*/, nread_ptr/*: number*/)/*: number*/ {
+                console.log('path_readlink');
                 let buffer = new DataView(self.inst.exports.memory.buffer);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
@@ -395,6 +431,7 @@ export default class WASI {
                 }
             },
             path_remove_directory(fd/*: number*/, path_ptr/*: number*/, path_len/*: number*/)/*: number*/ {
+                console.log('path_remove_directory');
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
                     let path = new TextDecoder("utf-8").decode(buffer8.slice(path_ptr, path_ptr + path_len));
@@ -404,9 +441,11 @@ export default class WASI {
                 }
             },
             path_rename(fd/*: number*/, old_path_ptr/*: number*/, old_path_len/*: number*/, new_fd/*: number*/, new_path_ptr/*: number*/, new_path_len/*: number*/)/*: number*/ {
+                console.log('path_rename');
                 throw "FIXME what is the best abstraction for this?";
             },
             path_symlink(old_path_ptr/*: number*/, old_path_len/*: number*/, fd/*: number*/, new_path_ptr/*: number*/, new_path_len/*: number*/)/*: number*/ {
+                console.log('path_symlink');
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
                     let old_path = new TextDecoder("utf-8").decode(buffer8.slice(old_path_ptr, old_path_ptr + old_path_len));
@@ -417,6 +456,7 @@ export default class WASI {
                 }
             },
             path_unlink_file(fd/*: number*/, path_ptr/*: number*/, path_len/*: number*/)/*: number*/ {
+                console.log('path_unlink_file');
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 if (self.fds[fd] != undefined) {
                     let path = new TextDecoder("utf-8").decode(buffer8.slice(path_ptr, path_ptr + path_len));
@@ -426,28 +466,37 @@ export default class WASI {
                 }
             },
             poll_oneoff(in_, out, nsubscriptions) {
+                console.log('poll_oneoff');
                 throw "async io not supported";
             },
             proc_exit(exit_code/*: number*/) {
+                console.log('proc_exit');
                 throw "exit with exit code " + exit_code;
             },
             proc_raise(sig/*: number*/) {
+                console.log('proc_raise');
                 throw "raised signal " + sig;
             },
-            sched_yield() {},
+            sched_yield() {
+                console.log('sched_yield');
+            },
             random_get(buf/*: number*/, buf_len/*: number*/) {
+                console.log('random_get', buf, buf_len);
                 let buffer8 = new Uint8Array(self.inst.exports.memory.buffer);
                 for (let i = 0; i < buf_len; i++) {
                     buffer8[buf + i] = (Math.random() * 256) | 0;
                 }
             },
             sock_recv(fd/*: number*/, ri_data, ri_flags) {
+                console.log('sock_recv');
                 throw "sockets not supported";
             },
             sock_send(fd/*: number*/, si_data, si_flags) {
+                console.log('sock_send');
                 throw "sockets not supported";
             },
             sock_shutdown(fd/*: number*/, how) {
+                console.log('sock_shutdown');
                 throw "sockets not supported";
             }
         };

@@ -60,6 +60,7 @@ export class OpenFile extends Fd {
         let nwritten = 0;
         for (let iovec of iovs) {
             let buffer = view8.slice(iovec.buf, iovec.buf + iovec.buf_len);
+            console.log('fd_write', buffer);
             if (this.file_pos + BigInt(buffer.byteLength) > this.file.size) {
                 let old = this.file.data;
                 this.file.data = new Uint8Array(Number(this.file_pos + BigInt(buffer.byteLength)));
@@ -74,6 +75,7 @@ export class OpenFile extends Fd {
             this.file_pos += BigInt(buffer.byteLength);
             nwritten += iovec.buf_len;
         }
+        console.log('fd_write', nwritten);
         return { ret: 0, nwritten };
     }
 
@@ -113,6 +115,19 @@ export class OpenDirectory extends Fd {
             return { ret: -1, filestat: null };
         }
         return { ret: 0, filestat: entry.stat() };
+    }
+
+    path_create_directory(
+      path/*: string*/,
+    )/*: number */ {
+        console.log(path);
+        let entry = this.dir.get_entry_for_path(path);
+        if (entry != null) {
+            return ERRNO_EXIST;
+        }
+
+        entry = this.dir.create_entry_for_path(path, true);
+        return 0;
     }
 
     path_open(
